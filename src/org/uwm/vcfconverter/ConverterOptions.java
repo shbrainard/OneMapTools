@@ -45,6 +45,7 @@ public class ConverterOptions {
 				typesToKeep.add(markerType);
 			}
 			typesToKeep.remove(MarkerType.HOMOZYGOUS);
+			typesToKeep.remove(MarkerType.EACH_HOMOZYGOUS);
 		}
 		return new ConverterOptions(props.get("female_parent"), props.get("male_parent"), props.get("vcf_file"), 
 				props.get("output_file"), typesToKeep, props.get("data_type"), 
