@@ -18,6 +18,7 @@ public class ConverterOptionsTest {
 			typesToKeep.add(markerType);
 		}
 		typesToKeep.remove(MarkerType.HOMOZYGOUS);
+		typesToKeep.remove(MarkerType.EACH_HOMOZYGOUS);
 		ConverterOptions opts = ConverterOptions.loadOptions(args);
 		assertEquals(opts.getDataType(), "outcross");
 		assertEquals(opts.getFemaleParentName(), "I_fem_par");
