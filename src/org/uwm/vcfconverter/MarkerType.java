@@ -2,6 +2,7 @@ package org.uwm.vcfconverter;
 
 public enum MarkerType {
 	HOMOZYGOUS("Homozygous", "aaaa"),
+	EACH_HOMOZYGOUS("Each homozygous", "aabb"),
 	B37("B3.7", "abab"), // ab x ab
 	B110("B1.10", "abaa"), // ab x aa
 	D215("D2.15", "aaab"), // aa x ab

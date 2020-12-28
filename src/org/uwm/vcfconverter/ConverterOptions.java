@@ -22,6 +22,7 @@ public class ConverterOptions {
 	private final Set<MarkerType> toKeep;
 	private final String dataType;
 	private final boolean onlyPhased;
+	private final boolean shouldVerify;
 	
 	public static ConverterOptions loadOptions(String[] args) {
 		Map<String, String> props = new HashMap<>();
@@ -45,14 +46,16 @@ public class ConverterOptions {
 				typesToKeep.add(markerType);
 			}
 			typesToKeep.remove(MarkerType.HOMOZYGOUS);
+			typesToKeep.remove(MarkerType.EACH_HOMOZYGOUS);
 		}
 		return new ConverterOptions(props.get("female_parent"), props.get("male_parent"), props.get("vcf_file"), 
 				props.get("output_file"), typesToKeep, props.get("data_type"), 
-				props.containsKey("only_phased") ? Boolean.parseBoolean(props.get("only_phased")) : false);
+				props.containsKey("only_phased") ? Boolean.parseBoolean(props.get("only_phased")) : false,
+						props.containsKey("verify_uniform_offspring") ? Boolean.parseBoolean(props.get("verify_uniform_offspring")) : false);
 	}
 	
 	private ConverterOptions(String femaleParentName, String maleParentName, String inputFile, String outputFile,
-			Set<MarkerType> toKeep, String dataType, boolean onlyPhased) {
+			Set<MarkerType> toKeep, String dataType, boolean onlyPhased, boolean shouldVerify) {
 		this.femaleParentName = femaleParentName;
 		this.maleParentName = maleParentName;
 		this.inputFile = inputFile;
@@ -60,6 +63,7 @@ public class ConverterOptions {
 		this.toKeep = toKeep;
 		this.dataType = dataType;
 		this.onlyPhased = onlyPhased;
+		this.shouldVerify = shouldVerify;
 	}
 	
 	public String getFemaleParentName() {
@@ -102,7 +106,7 @@ public class ConverterOptions {
 	public String toString() {
 		return "ConverterOptions [femaleParentName=" + femaleParentName + ", maleParentName=" + maleParentName
 				+ ", inputFile=" + inputFile + ", outputFile=" + outputFile + ", toKeep=" + toKeep + ", dataType="
-				+ dataType + ", onlyPhased=" + onlyPhased + "]";
+				+ dataType + ", onlyPhased=" + onlyPhased + ", shouldVerify=" + shouldVerify + "]";
 	}
 
 	public String getInputFile() {
@@ -111,6 +115,10 @@ public class ConverterOptions {
 
 	public String getOutputFile() {
 		return outputFile;
+	}
+
+	public boolean shouldVerify() {
+		return shouldVerify;
 	}
 	
 	

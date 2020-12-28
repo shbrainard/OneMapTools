@@ -15,7 +15,7 @@ public class ConverterTest {
 	@Test
 	public void testConverter() throws Exception {
 		String[] args = new String[] {"Female_parent=I_fem_par", "male_parent=I_male_par", "vcf_file=test_input.txt",
-				"output_file=test_output.txt", "data_type=outcross"};
+				"output_file=test_output.txt", "data_type=outcross", "verify_uniform_offspring=true"};
 		Converter.main(args);
 		List<String> lines = Files.readAllLines(Paths.get("test_output.txt"));
 		List<String> expected = new ArrayList<>();

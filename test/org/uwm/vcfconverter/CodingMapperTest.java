@@ -9,6 +9,7 @@ public class CodingMapperTest {
 	@Test
 	public void testMapping() throws Exception {
 		assertEquals(MarkerType.HOMOZYGOUS, getType(new Pair(0,0), new Pair(0, 0))); 
+		assertEquals(MarkerType.EACH_HOMOZYGOUS, getType(new Pair(0,0), new Pair(1,1))); 
 		assertEquals(MarkerType.D214, getType(new Pair(0,0), new Pair(1, 2))); 
 		assertEquals(MarkerType.D214, getType(new Pair(1,1), new Pair(0, 2))); 
 		assertEquals(MarkerType.B110, getType(new Pair(0,1), new Pair(1, 1))); 

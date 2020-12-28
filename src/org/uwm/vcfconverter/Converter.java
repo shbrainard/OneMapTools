@@ -103,6 +103,9 @@ public class Converter {
 		}
 		MarkerType type = getType(mapper, firstParentVal, secondParentVal);
 		if (shouldFilter(type, opts)) {
+			if (shouldVerify(type, opts)) {
+				runVerification(data, parentCols, type, mapper, metadata);
+			}
 			metadata.incFilteredType();
 			return;
 		}
@@ -129,6 +132,25 @@ public class Converter {
 		metadata.incLines();
 		out.write(output.toString());
 		out.newLine();
+	}
+
+	private static boolean shouldVerify(MarkerType type, ConverterOptions opts) {
+		return (type == MarkerType.HOMOZYGOUS || type == MarkerType.EACH_HOMOZYGOUS) && opts.shouldVerify();
+	}
+
+	private static void runVerification(String[] data, Pair parentCols, MarkerType type, CodingMapper mapper,
+			Metadata metadata) {
+		String expected = type == MarkerType.HOMOZYGOUS ? "aa" : "ab";
+		for (int i = NUM_NON_DATA_HEADERS; i < data.length; i++) {
+			if (i == parentCols.getLhSide() || i == parentCols.getRhSide()) {
+				continue; // don't print the parents
+			}
+			Pair dataVal = getVal(data, i);
+			String converted = mapper.map(dataVal);
+			if (!expected.equals(converted)) {
+				metadata.incBadMatch(i);
+			}
+		}
 	}
 
 	public static MarkerType getType(CodingMapper mapper, Pair firstParentVal, Pair secondParentVal) {
