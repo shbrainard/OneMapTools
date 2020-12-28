@@ -1,5 +1,8 @@
 package org.uwm.vcfconverter;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Metadata {
    private final Pair parentCols;
    private final int nIndividuals;
@@ -8,6 +11,7 @@ public class Metadata {
    private int numNoMatch = 0;
    private int numFilteredType = 0;
    private final String[] headers;
+   private Map<Integer, Integer> badMatch = new HashMap<>();
    
    public Metadata(Pair parentCols, int nIndividuals, String[] headers) {
 	   this.parentCols = parentCols;
@@ -48,6 +52,11 @@ public class Metadata {
    }
    
    public String getStatus() {
-	   return "Filtered due to VCF status: " + numFiltered + " Filtered due to type: " + numFilteredType + " Filtered due to no match: " + numNoMatch;
+	   return "Filtered due to VCF status: " + numFiltered + " Filtered due to type: " + numFilteredType + " Filtered due to no match: " + numNoMatch
+			   + "\nBad match counts: " + badMatch;
+   }
+
+   public void incBadMatch(int index) {
+	   badMatch.put(index, badMatch.computeIfAbsent(index, _unused -> 0) + 1);
    }
 }
