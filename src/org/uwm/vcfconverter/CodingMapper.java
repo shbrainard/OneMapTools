@@ -68,7 +68,7 @@ public class CodingMapper {
 	
 	public char map(int val) {
 		if (!mapping.containsKey(val)) {
-			throw new IllegalStateException("No mapping for value " + val + " in " + mapping);
+			return '-';
 		}
 		return mapping.get(val);
 	}
