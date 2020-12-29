@@ -121,12 +121,16 @@ public class Converter {
 				continue; // don't print the parents
 			}
 			Pair dataVal = getVal(data, i);
-			if (opts.isOnlyPhased() && data[i].charAt(1) == '/') {
-				metadata.incNumFiltered();
-				return; // skip this marker, it had unphased data
+			String converted;
+			if (dataVal != null) {
+				if (opts.isOnlyPhased() && data[i].charAt(1) == '/') {
+					metadata.incNumFiltered();
+					return; // skip this marker, it had unphased data
+				}
+				converted = mapper.map(dataVal);
+			} else {
+				converted = "-";
 			}
-			String converted = mapper.map(dataVal);
-			// TODO: how does VCF display sample missing data (ie, the - in OneMap)?
 			output.append(SEP_CHAR).append(converted);
 		}
 		metadata.incLines();
@@ -169,6 +173,9 @@ public class Converter {
 
 	private static Pair getVal(String[] data, int index) {
 		String unparsed = data[index];
+		if (unparsed.charAt(0) == '.' || unparsed.charAt(2) == '.') {
+			return null; // missing data
+		}
 		return new Pair(Integer.parseInt("" + unparsed.charAt(0)),  Integer.parseInt("" + unparsed.charAt(2)));
 	}
 
