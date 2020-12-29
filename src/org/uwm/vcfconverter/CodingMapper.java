@@ -1,11 +1,11 @@
 package org.uwm.vcfconverter;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 public class CodingMapper {
@@ -15,7 +15,7 @@ public class CodingMapper {
 		this.mapping = mapping;
 	}
 
-	public static CodingMapper create(Pair p1, Pair p2) {
+	public static Optional<CodingMapperSpec> create(Pair p1, Pair p2) {
 		// OneMap can't represent all mappings, and there seems to be little rhyme or reason as to what mappings it accepts (although
 		// each pair is sorted alphabetically).
 		// ab x aa is fine, but not ab x bb, but also cc x ab is fine, but not aa x bc. So, we'll pick a mapping, and see if it
@@ -54,16 +54,16 @@ public class CodingMapper {
 			String encodedType = mapper.map(p1, p2);
 			for (MarkerType type : MarkerType.values()) {
 				if (type.getMatchingString().equals(encodedType)) {
-					return mapper; // this is a valid mapping
+					return Optional.of(new CodingMapperSpec(mapper, type)); // this is a valid mapping
 				}
 			}
 		}
-		return null;
+		return Optional.empty();
 	}
 	
 	public String map(Pair p1, Pair p2) {
-		return new StringBuilder().append(map(p1))
-				.append(map(p2)).toString();
+		return new StringBuilder().append(mapNoCollapse(p1))
+				.append(mapNoCollapse(p2)).toString();
 	}
 	
 	public char map(int val) {
@@ -72,18 +72,23 @@ public class CodingMapper {
 		}
 		return mapping.get(val);
 	}
+	
+	private String mapNoCollapse(Pair pair) {
+		// sort these so we always return ab, not ba
+		// also, aa should be returned as a
+		char ch1 = map(pair.getLhSide());
+		char ch2 = map(pair.getRhSide());
+		return ch1 > ch2 ? "" + ch2 + ch1 :
+			"" + ch1 + ch2;
+	}
 
 	public String map(Pair pair) {
 		// sort these so we always return ab, not ba
-		StringBuilder result = new StringBuilder();
-		List<Character> mapped = new ArrayList<>();
-		mapped.add(map(pair.getLhSide()));
-		mapped.add(map(pair.getRhSide()));
-		Collections.sort(mapped);
-		for (char ch : mapped) {
-			result.append(ch);
-		}
-		return result.toString();
+		// also, aa should be returned as a
+		char ch1 = map(pair.getLhSide());
+		char ch2 = map(pair.getRhSide());
+		return ch1 > ch2 ? "" + ch2 + ch1 :
+			ch1 == ch2 ? "" + ch1 : "" + ch1 + ch2;
 	}
 
 }

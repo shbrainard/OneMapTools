@@ -12,10 +12,10 @@ public class CodingMapperTest {
 		assertEquals(MarkerType.EACH_HOMOZYGOUS, getType(new Pair(0,0), new Pair(1,1))); 
 		assertEquals(MarkerType.D214, getType(new Pair(0,0), new Pair(1, 2))); 
 		assertEquals(MarkerType.D214, getType(new Pair(1,1), new Pair(0, 2))); 
-		assertEquals(MarkerType.B110, getType(new Pair(0,1), new Pair(1, 1))); 
-		assertEquals(MarkerType.B110, getType(new Pair(1,0), new Pair(0, 0))); 
-		assertEquals(MarkerType.B110, getType(new Pair(0,1), new Pair(0, 0))); 
-		assertEquals(MarkerType.B110, getType(new Pair(0,2), new Pair(0, 0))); 
+		assertEquals(MarkerType.D110, getType(new Pair(0,1), new Pair(1, 1))); 
+		assertEquals(MarkerType.D110, getType(new Pair(1,0), new Pair(0, 0))); 
+		assertEquals(MarkerType.D110, getType(new Pair(0,1), new Pair(0, 0))); 
+		assertEquals(MarkerType.D110, getType(new Pair(0,2), new Pair(0, 0))); 
 		assertEquals(MarkerType.B37, getType(new Pair(1,0), new Pair(0, 1))); 
 		assertEquals(MarkerType.B37, getType(new Pair(0,1), new Pair(0, 1))); 
 		assertEquals(MarkerType.B37, getType(new Pair(0,2), new Pair(0, 2))); 
@@ -25,6 +25,6 @@ public class CodingMapperTest {
 	}
 
 	private MarkerType getType(Pair p1, Pair p2) {
-		return Converter.getType(CodingMapper.create(p1, p2), p1, p2);
+		return CodingMapper.create(p1, p2).get().markerType;
 	}
 }

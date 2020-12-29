@@ -8,7 +8,7 @@ java -cp converter.jar org.uwm.vcfconverter.Converter female_parent=\<header\> m
 other options:
 only_phased=true
 verify_uniform_offspring=true
-types_to_keep=\<comma separated list of types, right now just B3.7, B1.10, and D2.15\>
+types_to_keep=\<comma separated list of types, right now just B3.7, D1.10, and D2.15\>
 
 After generating the one map file, the tool will print how many markers were filtered, and why:
 - due to having a filter status other than PASS in the VCF file

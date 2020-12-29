@@ -1,7 +1,15 @@
 package org.uwm.vcfconverter;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class Metadata {
    private final Pair parentCols;
@@ -11,7 +19,7 @@ public class Metadata {
    private int numNoMatch = 0;
    private int numFilteredType = 0;
    private final String[] headers;
-   private Map<Integer, Integer> badMatch = new HashMap<>();
+   private Map<String, Set<String>> badMatch = new HashMap<>();
    
    public Metadata(Pair parentCols, int nIndividuals, String[] headers) {
 	   this.parentCols = parentCols;
@@ -52,11 +60,25 @@ public class Metadata {
    }
    
    public String getStatus() {
-	   return "Filtered due to VCF status: " + numFiltered + " Filtered due to type: " + numFilteredType + " Filtered due to no match: " + numNoMatch
-			   + "\nBad match counts: " + badMatch;
+	   return "Filtered due to VCF status: " + numFiltered + " Filtered due to type: " + numFilteredType + " Filtered due to unable to parse line: " + numNoMatch;
    }
 
-   public void incBadMatch(int index) {
-	   badMatch.put(index, badMatch.computeIfAbsent(index, _unused -> 0) + 1);
+   public void incBadMatch(int index, String marker) {
+	  badMatch.computeIfAbsent(headers[index], _unused -> new HashSet<>()).add(marker);
+   }
+
+   public void logBadMatches(String logFile) throws IOException {
+	   try (BufferedWriter buff = new BufferedWriter(new FileWriter(logFile))) {
+		   badMatch.forEach((id, marker) -> {
+			   try {
+				   List<String> sorted = new ArrayList<>(marker);
+				   Collections.sort(sorted);
+				   buff.write("marker: " + id + " count: " + sorted.size() + " markers: " + sorted);
+				   buff.newLine();
+			   } catch (IOException e) {
+				   throw new RuntimeException(e);
+			   }
+		   });
+	   }
    }
 }

@@ -22,9 +22,9 @@ public class ConverterTest {
 		expected.add("data type outcross");
 		expected.add("3 3 0 0 0");
 		expected.add("I1 I2 I3");
-		expected.add("*first B3.7 aa ab bb");
-		expected.add("*second B1.10 aa ab aa");
-		expected.add("*third D2.15 ab ab bb");
+		expected.add("*first B3.7 a ab b");
+		expected.add("*second D1.10 a ab a");
+		expected.add("*third D2.15 ab ab b");
 		
 		assertEquals(lines, expected);
 	}
