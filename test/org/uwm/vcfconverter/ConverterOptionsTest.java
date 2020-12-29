@@ -30,12 +30,12 @@ public class ConverterOptionsTest {
 		assertEquals(opts.shouldVerify(), false);
 		
 		args = new String[] {"female_parent=I_fem_par", "male_parent=I_male_par", "vcf_file=inputFile",
-				"output_file=outputFile", "data_type=outcross", "only_phased=tRue", "types_to_keep=B3.7,B1.10",
+				"output_file=outputFile", "data_type=outcross", "only_phased=tRue", "types_to_keep=B3.7,D1.10",
 				"verify_uniform_offspring=true"};
 		opts = ConverterOptions.loadOptions(args);
 		Set<MarkerType> types = new HashSet<>();
 		types.add(MarkerType.B37);
-		types.add(MarkerType.B110);
+		types.add(MarkerType.D110);
 		assertEquals(opts.getToKeep(), types);
 		assertEquals(opts.isOnlyPhased(), true);
 		assertEquals(opts.shouldVerify(), true);
