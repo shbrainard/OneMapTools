@@ -164,7 +164,7 @@ public class Converter {
 
 	private static void runVerification(String id, String[] data, Pair parentCols, MarkerType type, CodingMapper mapper,
 			Metadata metadata) {
-		String expected = type == MarkerType.HOMOZYGOUS ? "aa" : "ab";
+		String expected = type == MarkerType.HOMOZYGOUS ? "a" : "ab";
 		for (int i = NUM_NON_DATA_HEADERS; i < data.length; i++) {
 			if (i == parentCols.getLhSide() || i == parentCols.getRhSide()) {
 				continue; // don't print the parents
