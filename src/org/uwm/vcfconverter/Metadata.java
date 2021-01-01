@@ -63,8 +63,8 @@ public class Metadata {
 	   return "Filtered due to VCF status: " + numFiltered + " Filtered due to type: " + numFilteredType + " Filtered due to unable to parse line: " + numNoMatch;
    }
 
-   public void incBadMatch(int index, String marker) {
-	  badMatch.computeIfAbsent(headers[index], _unused -> new HashSet<>()).add(marker);
+   public void incBadMatch(int index, String marker, String expected, String found) {
+	  badMatch.computeIfAbsent(headers[index], _unused -> new HashSet<>()).add(marker + "[expected: " + expected + ", found: " + found + "]");
    }
 
    public void logBadMatches(String logFile) throws IOException {
@@ -73,7 +73,7 @@ public class Metadata {
 			   try {
 				   List<String> sorted = new ArrayList<>(marker);
 				   Collections.sort(sorted);
-				   buff.write("marker: " + id + " count: " + sorted.size() + " markers: " + sorted);
+				   buff.write("individual: " + id + " count: " + sorted.size() + " markers: " + sorted);
 				   buff.newLine();
 			   } catch (IOException e) {
 				   throw new RuntimeException(e);

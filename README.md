@@ -9,6 +9,7 @@ other options:
 only_phased=true
 verify_uniform_offspring=true
 types_to_keep=\<comma separated list of types, right now just B3.7, D1.10, and D2.15\>
+log_filtered_markers=true
 
 After generating the one map file, the tool will print how many markers were filtered, and why:
 - due to having a filter status other than PASS in the VCF file

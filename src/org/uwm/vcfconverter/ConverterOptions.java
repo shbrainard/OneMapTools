@@ -23,6 +23,7 @@ public class ConverterOptions {
 	private final String dataType;
 	private final boolean onlyPhased;
 	private final boolean shouldVerify;
+	private final boolean logFiltering;
 	
 	public static ConverterOptions loadOptions(String[] args) {
 		Map<String, String> props = new HashMap<>();
@@ -51,11 +52,12 @@ public class ConverterOptions {
 		return new ConverterOptions(props.get("female_parent"), props.get("male_parent"), props.get("vcf_file"), 
 				props.get("output_file"), typesToKeep, props.get("data_type"), 
 				props.containsKey("only_phased") ? Boolean.parseBoolean(props.get("only_phased")) : false,
-						props.containsKey("verify_uniform_offspring") ? Boolean.parseBoolean(props.get("verify_uniform_offspring")) : false);
+				props.containsKey("verify_uniform_offspring") ? Boolean.parseBoolean(props.get("verify_uniform_offspring")) : false,
+				props.containsKey("log_filtered_markers") ? Boolean.parseBoolean(props.get("log_filtered_markers")) : false);
 	}
 	
 	private ConverterOptions(String femaleParentName, String maleParentName, String inputFile, String outputFile,
-			Set<MarkerType> toKeep, String dataType, boolean onlyPhased, boolean shouldVerify) {
+			Set<MarkerType> toKeep, String dataType, boolean onlyPhased, boolean shouldVerify, boolean logFiltering) {
 		this.femaleParentName = femaleParentName;
 		this.maleParentName = maleParentName;
 		this.inputFile = inputFile;
@@ -64,6 +66,7 @@ public class ConverterOptions {
 		this.dataType = dataType;
 		this.onlyPhased = onlyPhased;
 		this.shouldVerify = shouldVerify;
+		this.logFiltering = logFiltering;
 	}
 	
 	public String getFemaleParentName() {
@@ -106,7 +109,8 @@ public class ConverterOptions {
 	public String toString() {
 		return "ConverterOptions [femaleParentName=" + femaleParentName + ", maleParentName=" + maleParentName
 				+ ", inputFile=" + inputFile + ", outputFile=" + outputFile + ", toKeep=" + toKeep + ", dataType="
-				+ dataType + ", onlyPhased=" + onlyPhased + ", shouldVerify=" + shouldVerify + "]";
+				+ dataType + ", onlyPhased=" + onlyPhased + ", shouldVerify=" + shouldVerify + ", logFiltering="
+				+ logFiltering + "]";
 	}
 
 	public String getInputFile() {
@@ -120,6 +124,9 @@ public class ConverterOptions {
 	public boolean shouldVerify() {
 		return shouldVerify;
 	}
-	
+
+	public boolean logFiltering() {
+		return logFiltering;
+	}
 	
 }

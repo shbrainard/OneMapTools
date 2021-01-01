@@ -68,7 +68,7 @@ public class CodingMapper {
 	
 	public char map(int val) {
 		if (!mapping.containsKey(val)) {
-			return '-';
+			return (char) ('a' + mapping.size());
 		}
 		return mapping.get(val);
 	}

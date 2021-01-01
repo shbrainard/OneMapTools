@@ -21,6 +21,7 @@ public class Converter {
 	   File tempFile = new File(opts.getOutputFile() + "-temp");
 	   tempFile.deleteOnExit();
 	   try (BufferedWriter out = new BufferedWriter(new FileWriter(tempFile));
+			   BufferedWriter verbose = opts.logFiltering() ? new BufferedWriter(new FileWriter(opts.getInputFile() + ".filtered.log")) : null;
 			   BufferedReader in = new BufferedReader(opts.getInputReader())) {
 		   String line;
 		   String lastHeader = null;
@@ -39,7 +40,7 @@ public class Converter {
 			   if (id.equals(".")) {
 				   id = "missing-" + lineParts[0] + "-" + lineParts[1] + "-" + metadata.getNLines();
 			   }
-			   writeMarker(id, lineParts, metadata.getParentCols(), opts, out, metadata);
+			   writeMarker(id, lineParts, metadata.getParentCols(), opts, out, metadata, verbose);
 			   if (metadata.getNLines() % REPORT_FREQUENCY == 0) {
 				   System.out.println("Processed " + metadata.getNLines());
 			   }
@@ -54,7 +55,9 @@ public class Converter {
 		   String logFile = opts.getInputFile() + ".bad.log";
 		   metadata.logBadMatches(logFile);
 		   System.out.println("Individuals and markers failing validation stored at " + logFile);
-		   
+	   }
+	   if (opts.logFiltering()) {
+		   System.out.println("Filtered marker details stored at " + opts.getInputFile() + ".filtered.log");
 	   }
 	   
 	}
@@ -107,21 +110,24 @@ public class Converter {
 
 	// aa x ab, ab x ab, ab x aa
 	private static void writeMarker(String id, String[] data, Pair parentCols, ConverterOptions opts, BufferedWriter out,
-			Metadata metadata) throws IOException {
+			Metadata metadata, BufferedWriter verbose) throws IOException {
 		Optional<Pair> firstParentVal = getVal(data, parentCols.getLhSide());
 		Optional<Pair> secondParentVal = getVal(data, parentCols.getRhSide());
 		if (!firstParentVal.isPresent() || !secondParentVal.isPresent()) {
 			metadata.incNoMatch();
+			logIfNeeded(opts.logFiltering(), verbose, id, "Missing parent data");
 			return;
 		}
 		if (!data[6].equals("PASS")) {
 			metadata.incNumFiltered();
+			logIfNeeded(opts.logFiltering(), verbose, id, "VCF filter: " + data[6]);
 			return;
 		}
 		
 		Optional<CodingMapperSpec> optMapper = CodingMapper.create(firstParentVal.get(), secondParentVal.get());
 		if (!optMapper.isPresent()) {
 			metadata.incNoMatch();
+			logIfNeeded(opts.logFiltering(), verbose, id, "Unable to parse line");
 			return;
 		}
 		CodingMapper mapper = optMapper.get().mapper;
@@ -132,6 +138,7 @@ public class Converter {
 				runVerification(id, data, parentCols, type, mapper, metadata);
 			}
 			metadata.incFilteredType();
+			logIfNeeded(opts.logFiltering(), verbose, id, "Filtered type " + type);
 			return;
 		}
 		
@@ -145,6 +152,7 @@ public class Converter {
 			if (dataVal.isPresent()) {
 				if (opts.isOnlyPhased() && data[i].charAt(1) == '/') {
 					metadata.incNumFiltered();
+					logIfNeeded(opts.logFiltering(), verbose, id, "Filtering unphased data");
 					return; // skip this marker, it had unphased data
 				}
 				converted = mapper.map(dataVal.get());
@@ -156,6 +164,13 @@ public class Converter {
 		metadata.incLines();
 		out.write(output.toString());
 		out.newLine();
+	}
+
+	private static void logIfNeeded(boolean logFiltering, BufferedWriter verbose, String id, String reason) throws IOException {
+		if (logFiltering) {
+			verbose.write(id + ": " + reason);
+			verbose.newLine();
+		}
 	}
 
 	private static boolean shouldVerify(MarkerType type, ConverterOptions opts) {
@@ -173,7 +188,7 @@ public class Converter {
 			if (dataVal.isPresent()) {
 				String converted = mapper.map(dataVal.get());
 				if (!expected.equals(converted)) {
-					metadata.incBadMatch(i, id);
+					metadata.incBadMatch(i, id, expected, converted);
 				}
 			}
 		}
