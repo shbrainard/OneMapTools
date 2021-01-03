@@ -11,8 +11,14 @@ import java.util.Set;
 public class CodingMapper {
 	private final Map<Integer, Character> mapping;
 	
-	private CodingMapper(Map<Integer, Character> mapping) {
+	// there is one, and only one, instance where the mapping shouldn't be sorted alphabetically
+	// this is beyond ridiculous, but such is life (it's not even one *type* that isn't alphabetical, or one child across all types -
+	// it's just one specific child of one specific type)
+	private final boolean mixThingsUp;
+	
+	private CodingMapper(Map<Integer, Character> mapping, boolean mixThingsUp) {
 		this.mapping = mapping;
+		this.mixThingsUp = mixThingsUp;
 	}
 
 	public static Optional<CodingMapperSpec> create(Pair p1, Pair p2) {
@@ -50,10 +56,13 @@ public class CodingMapper {
 				mapping.put(val, (char) ('a' + mapping.size()));
 			}
 			
-			CodingMapper mapper = new CodingMapper(mapping);
+			CodingMapper mapper = new CodingMapper(mapping, false);
 			String encodedType = mapper.map(p1, p2);
 			for (MarkerType type : MarkerType.values()) {
 				if (type.getMatchingString().equals(encodedType)) {
+					if (type == MarkerType.A2) {
+						return Optional.of(new CodingMapperSpec(new CodingMapper(mapping, true), type));
+					}
 					return Optional.of(new CodingMapperSpec(mapper, type)); // this is a valid mapping
 				}
 			}
@@ -87,8 +96,12 @@ public class CodingMapper {
 		// also, aa should be returned as a
 		char ch1 = map(pair.getLhSide());
 		char ch2 = map(pair.getRhSide());
-		return ch1 > ch2 ? "" + ch2 + ch1 :
+		String result = ch1 > ch2 ? "" + ch2 + ch1 :
 			ch1 == ch2 ? "" + ch1 : "" + ch1 + ch2;
+		if (mixThingsUp && result.equals("ab")) {
+			return "ba";
+		}
+		return result;
 	}
 
 }

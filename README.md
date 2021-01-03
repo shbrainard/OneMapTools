@@ -14,4 +14,5 @@ log_filtered_markers=true
 After generating the one map file, the tool will print how many markers were filtered, and why:
 - due to having a filter status other than PASS in the VCF file
 - due to being a filtered type (by default, just homozygous aa x aa)
+- due to missing data for a parent
 - due to a different failure of the converter to read the line in the VCF file (generally, indicates a bug)

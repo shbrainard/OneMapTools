@@ -20,6 +20,7 @@ public class Metadata {
    private int numFilteredType = 0;
    private final String[] headers;
    private Map<String, Set<String>> badMatch = new HashMap<>();
+   private int noParentData = 0;
    
    public Metadata(Pair parentCols, int nIndividuals, String[] headers) {
 	   this.parentCols = parentCols;
@@ -60,7 +61,7 @@ public class Metadata {
    }
    
    public String getStatus() {
-	   return "Filtered due to VCF status: " + numFiltered + " Filtered due to type: " + numFilteredType + " Filtered due to unable to parse line: " + numNoMatch;
+	   return "Filtered due to VCF status: " + numFiltered + " Filtered due to type: " + numFilteredType + " Filtered due to mising parent data: " + noParentData + " Filtered due to unable to parse line: " + numNoMatch;
    }
 
    public void incBadMatch(int index, String marker, String expected, String found) {
@@ -80,5 +81,9 @@ public class Metadata {
 			   }
 		   });
 	   }
+   }
+
+   public void incNoParentData() {
+	  noParentData++;
    }
 }
