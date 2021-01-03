@@ -24,7 +24,7 @@ public class ConverterTest {
 		expected.add("I1 I2 I3");
 		expected.add("*first B3.7 a ab b");
 		expected.add("*second D1.10 a ab a");
-		expected.add("*third D2.15 ab ab b");
+		expected.add("*third D2.15 ab ab a");
 		
 		assertEquals(lines, expected);
 	}

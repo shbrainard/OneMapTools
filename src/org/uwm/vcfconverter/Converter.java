@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Optional;
+import java.util.Set;
 
 public class Converter {
 	
@@ -21,10 +22,11 @@ public class Converter {
 	   File tempFile = new File(opts.getOutputFile() + "-temp");
 	   tempFile.deleteOnExit();
 	   try (BufferedWriter out = new BufferedWriter(new FileWriter(tempFile));
-			   BufferedWriter verbose = opts.logFiltering() ? new BufferedWriter(new FileWriter(opts.getInputFile() + ".filtered.log")) : null;
+			   BufferedWriter verbose = new BufferedWriter(new FileWriter(opts.getInputFile() + ".filtered.log"));
 			   BufferedReader in = new BufferedReader(opts.getInputReader())) {
 		   String line;
 		   String lastHeader = null;
+		   
 		   while ((line = in.readLine()) != null) {
 			   if (line.startsWith("#")) {
 				   lastHeader = line;
@@ -38,7 +40,7 @@ public class Converter {
 			   }
 			   String id = lineParts[2];
 			   if (id.equals(".")) {
-				   id = "missing-" + lineParts[0] + "-" + lineParts[1] + "-" + metadata.getNLines();
+				   id = lineParts[0] + "-" + lineParts[1] + "-" + metadata.getNLines();
 			   }
 			   writeMarker(id, lineParts, metadata.getParentCols(), opts, out, metadata, verbose);
 			   if (metadata.getNLines() % REPORT_FREQUENCY == 0) {
@@ -46,20 +48,20 @@ public class Converter {
 			   }
 		   }
 	   }
+	   
 	   prependHeader(opts, metadata);
 	   
 	   System.out.println("Completed conversion from " + opts.getInputFile() + " to " + opts.getOutputFile() + ".");
 	   System.out.println("First parent is " + opts.getFemaleParentName() + ", second parent is " + opts.getMaleParentName() + ".");
 	   System.out.println("Filtered data: " + metadata.getStatus());
-	   if (opts.shouldVerify()) {
-		   String logFile = opts.getInputFile() + ".bad.log";
-		   metadata.logBadMatches(logFile);
-		   System.out.println("Individuals and markers failing validation stored at " + logFile);
-	   }
+
+	   String logFile = opts.getInputFile() + ".bad.log";
+	   metadata.logBadMatches(logFile);
+	   System.out.println("Individuals and markers failing validation stored at " + logFile);
+
 	   if (opts.logFiltering()) {
 		   System.out.println("Filtered marker details stored at " + opts.getInputFile() + ".filtered.log");
 	   }
-	   
 	}
 
 	private static Metadata extractMetadata(ConverterOptions opts, String lastHeader) throws IOException {
@@ -114,7 +116,7 @@ public class Converter {
 		Optional<Pair> firstParentVal = getVal(data, parentCols.getLhSide());
 		Optional<Pair> secondParentVal = getVal(data, parentCols.getRhSide());
 		if (!firstParentVal.isPresent() || !secondParentVal.isPresent()) {
-			metadata.incNoMatch();
+			metadata.incNoParentData();
 			logIfNeeded(opts.logFiltering(), verbose, id, "Missing parent data");
 			return;
 		}
@@ -134,7 +136,7 @@ public class Converter {
 		MarkerType type =  optMapper.get().markerType;
 	
 		if (shouldFilter(type, opts)) {
-			if (shouldVerify(type, opts)) {
+			if (shouldVerify(opts)) {
 				runVerification(id, data, parentCols, type, mapper, metadata);
 			}
 			metadata.incFilteredType();
@@ -156,6 +158,10 @@ public class Converter {
 					return; // skip this marker, it had unphased data
 				}
 				converted = mapper.map(dataVal.get());
+				if (!type.getValidChildren().contains(converted)) {
+					metadata.incBadMatch(i, id, type.getValidChildren().toString(), converted);
+					converted = "-";
+				}
 			} else {
 				converted = "-";
 			}
@@ -173,13 +179,13 @@ public class Converter {
 		}
 	}
 
-	private static boolean shouldVerify(MarkerType type, ConverterOptions opts) {
-		return (type == MarkerType.HOMOZYGOUS || type == MarkerType.EACH_HOMOZYGOUS) && opts.shouldVerify();
+	private static boolean shouldVerify(ConverterOptions opts) {
+		return opts.shouldVerify();
 	}
 
 	private static void runVerification(String id, String[] data, Pair parentCols, MarkerType type, CodingMapper mapper,
 			Metadata metadata) {
-		String expected = type == MarkerType.HOMOZYGOUS ? "a" : "ab";
+		Set<String> expected = type.getValidChildren();
 		for (int i = NUM_NON_DATA_HEADERS; i < data.length; i++) {
 			if (i == parentCols.getLhSide() || i == parentCols.getRhSide()) {
 				continue; // don't print the parents
@@ -187,8 +193,8 @@ public class Converter {
 			Optional<Pair> dataVal = getVal(data, i);
 			if (dataVal.isPresent()) {
 				String converted = mapper.map(dataVal.get());
-				if (!expected.equals(converted)) {
-					metadata.incBadMatch(i, id, expected, converted);
+				if (!expected.contains(converted)) {
+					metadata.incBadMatch(i, id, expected.toString(), converted);
 				}
 			}
 		}

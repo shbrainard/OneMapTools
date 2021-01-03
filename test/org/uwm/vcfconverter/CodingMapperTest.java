@@ -22,6 +22,12 @@ public class CodingMapperTest {
 		assertEquals(MarkerType.D215, getType(new Pair(0,0), new Pair(0, 1))); 
 		assertEquals(MarkerType.D215, getType(new Pair(1,1), new Pair(0, 1))); 
 		assertEquals(MarkerType.D215, getType(new Pair(2,2), new Pair(1, 2))); 
+		
+		assertEquals(MarkerType.A2, getType(new Pair(1,2), new Pair(0, 2))); 
+		CodingMapper weirdMapper = CodingMapper.create(new Pair(1,2), new Pair(0, 2)).get().mapper;
+		assertEquals("a", weirdMapper.map(new Pair(2,2)));
+		assertEquals("ba", weirdMapper.map(new Pair(2,1)));
+		assertEquals("bc", weirdMapper.map(new Pair(0,1)));
 	}
 
 	private MarkerType getType(Pair p1, Pair p2) {
