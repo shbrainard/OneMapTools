@@ -1,18 +1,33 @@
 # OneMapTools
 Tools for preparing a VCF file for use in the OneMap pipeline
 
+ *Required values:*
+ 1) ```female_parent```: ID of the female parent, as encoded in the VCF file
+ 2) ```male_parent```: ID of the male parent, as encoded in the VCF file
+ 3) ```vcf_file```: absolute path of the VCF file 
+ 4) ```output_file```: absolute path to use for the OneMap .raw file and .log files 
+ 5) ```data_type```: cross type (f2 backcross, f2 intercross, ri self, ri sib, or outcross)
+
+ *Optional values:*
+ 1) ```only_phased```: retain only markers that are already phased in the VCF file (true/false, default=false)
+ 2) ```verify_uniform_offspring```: check all aaxaa and aaxbb segregation types, and record violations of expected progeny genotypes (i.e., "aa" and "ab", respectively), in the .log file
+ 3) ```types_to_keep```: comma separated list of segregation types to retain, when left blank, all segregation types are retained
+ 4) ```log_filtered_markers```: false by default.  Even when false, some summary statistics about how many markers were filtered and why.  If set to true, a separate .log file will be generated for markers that are filtered due to:
+
+- having a filter status other than PASS in the VCF file
+- being a filtered type (by default, just homozygous aa x aa)
+- missing data for a parent
+- failure of the converter to read the line in the VCF file (generally, indicates a bug)
+
 To run the tool:
+
 Compile the source code into converter.jar
-java -cp converter.jar org.uwm.vcfconverter.Converter female_parent=\<header\> male_parent=\<header\> vcf_file=\<vcf file\> output_file=\<output file\> data_type=\<data type\>
 
-other options:
-only_phased=true
-verify_uniform_offspring=true
-types_to_keep=\<comma separated list of types, right now just B3.7, D1.10, and D2.15\>
-log_filtered_markers=true
-
-After generating the one map file, the tool will print how many markers were filtered, and why:
-- due to having a filter status other than PASS in the VCF file
-- due to being a filtered type (by default, just homozygous aa x aa)
-- due to missing data for a parent
-- due to a different failure of the converter to read the line in the VCF file (generally, indicates a bug)
+Example usage:
+```bash
+export vcfFile=/PATH/TO/VCF
+export femaleParent="femaleID"
+export maleParent="maleID"
+export outputFile=/PATH/TO/OUTPUT/FILE
+java -cp converter.jar org.uwm.vcfconverter.Converter female_parent=$femaleParent male_parent=$maleParent vcf_file=$vcfFile output_file=$outputFile data_type=outcross verify_uniform_offspring=true log_filtered_markers=true
+```
