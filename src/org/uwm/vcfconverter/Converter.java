@@ -23,7 +23,8 @@ public class Converter {
 	   tempFile.deleteOnExit();
 	   try (BufferedWriter out = new BufferedWriter(new FileWriter(tempFile));
 			   BufferedWriter verbose = new BufferedWriter(new FileWriter(opts.getInputFile() + ".filtered.log"));
-			   BufferedReader in = new BufferedReader(opts.getInputReader())) {
+			   BufferedReader in = new BufferedReader(opts.getInputReader());
+			   BufferedWriter markerLog = new BufferedWriter(new FileWriter(opts.getInputFile() + ".badMarkers.log"))) {
 		   String line;
 		   String lastHeader = null;
 		   
@@ -42,7 +43,7 @@ public class Converter {
 			   if (id.equals(".")) {
 				   id = lineParts[0] + "-" + lineParts[1] + "-" + metadata.getNLines();
 			   }
-			   writeMarker(id, lineParts, metadata.getParentCols(), opts, out, metadata, verbose);
+			   writeMarker(id, lineParts, metadata.getParentCols(), opts, out, metadata, verbose, markerLog);
 			   if (metadata.getNLines() % REPORT_FREQUENCY == 0) {
 				   System.out.println("Processed " + metadata.getNLines());
 			   }
@@ -57,7 +58,8 @@ public class Converter {
 
 	   String logFile = opts.getInputFile() + ".bad.log";
 	   metadata.logBadMatches(logFile);
-	   System.out.println("Individuals and markers failing validation stored at " + logFile);
+	   System.out.println("Individuals and markers failing validation stored at " + logFile 
+			   + " and " + (opts.getInputFile() + ".badMarkers.log"));
 
 	   if (opts.logFiltering()) {
 		   System.out.println("Filtered marker details stored at " + opts.getInputFile() + ".filtered.log");
@@ -112,7 +114,7 @@ public class Converter {
 
 	// aa x ab, ab x ab, ab x aa
 	private static void writeMarker(String id, String[] data, Pair parentCols, ConverterOptions opts, BufferedWriter out,
-			Metadata metadata, BufferedWriter verbose) throws IOException {
+			Metadata metadata, BufferedWriter verbose, BufferedWriter markerLog) throws IOException {
 		Optional<Pair> firstParentVal = getVal(data, parentCols.getLhSide());
 		Optional<Pair> secondParentVal = getVal(data, parentCols.getRhSide());
 		if (!firstParentVal.isPresent() || !secondParentVal.isPresent()) {
@@ -134,13 +136,15 @@ public class Converter {
 		}
 		CodingMapper mapper = optMapper.get().mapper;
 		MarkerType type =  optMapper.get().markerType;
+		MarkerErrorInfo errorInfo = new MarkerErrorInfo(id, type);
 	
 		if (shouldFilter(type, opts)) {
 			if (shouldVerify(opts)) {
-				runVerification(id, data, parentCols, type, mapper, metadata);
+				runVerification(id, data, parentCols, type, mapper, metadata, errorInfo);
 			}
 			metadata.incFilteredType();
 			logIfNeeded(opts.logFiltering(), verbose, id, "Filtered type " + type);
+			errorInfo.logMarkerMismatch(markerLog);
 			return;
 		}
 		
@@ -160,6 +164,7 @@ public class Converter {
 				converted = mapper.map(dataVal.get());
 				if (!type.getValidChildren().contains(converted)) {
 					metadata.incBadMatch(i, id, type.getValidChildren().toString(), converted);
+					errorInfo.incBadMatch(metadata.getHeaders()[i], converted);
 					converted = "-";
 				}
 			} else {
@@ -167,6 +172,7 @@ public class Converter {
 			}
 			output.append(SEP_CHAR).append(converted);
 		}
+		errorInfo.logMarkerMismatch(markerLog);
 		metadata.incLines();
 		out.write(output.toString());
 		out.newLine();
@@ -184,7 +190,7 @@ public class Converter {
 	}
 
 	private static void runVerification(String id, String[] data, Pair parentCols, MarkerType type, CodingMapper mapper,
-			Metadata metadata) {
+			Metadata metadata, MarkerErrorInfo errorInfo) {
 		Set<String> expected = type.getValidChildren();
 		for (int i = NUM_NON_DATA_HEADERS; i < data.length; i++) {
 			if (i == parentCols.getLhSide() || i == parentCols.getRhSide()) {
@@ -195,6 +201,7 @@ public class Converter {
 				String converted = mapper.map(dataVal.get());
 				if (!expected.contains(converted)) {
 					metadata.incBadMatch(i, id, expected.toString(), converted);
+					errorInfo.incBadMatch(metadata.getHeaders()[i], converted);
 				}
 			}
 		}
