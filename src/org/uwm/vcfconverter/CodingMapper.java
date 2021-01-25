@@ -57,7 +57,7 @@ public class CodingMapper {
 			}
 			
 			CodingMapper mapper = new CodingMapper(mapping, false);
-			String encodedType = mapper.map(p1, p2);
+			String encodedType = mapper.mapNoCollapse(p1) + mapper.mapNoCollapse(p2);
 			for (MarkerType type : MarkerType.values()) {
 				if (type.getMatchingString().equals(encodedType)) {
 					if (type == MarkerType.A2) {
@@ -68,11 +68,6 @@ public class CodingMapper {
 			}
 		}
 		return Optional.empty();
-	}
-	
-	public String map(Pair p1, Pair p2) {
-		return new StringBuilder().append(mapNoCollapse(p1))
-				.append(mapNoCollapse(p2)).toString();
 	}
 	
 	public char map(int val) {
