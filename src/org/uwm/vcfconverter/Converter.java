@@ -17,6 +17,7 @@ public class Converter {
 
 	public static void main(String[] args) throws Exception {
 	   ConverterOptions opts = loadOptions(args);
+	   int nLinesRead = 0;
 
 	   Metadata metadata = null;
 	   File tempFile = new File(opts.getOutputFile() + "-temp");
@@ -29,6 +30,7 @@ public class Converter {
 		   String lastHeader = null;
 		   
 		   while ((line = in.readLine()) != null) {
+			   nLinesRead++;
 			   if (line.startsWith("#")) {
 				   lastHeader = line;
 				   continue;
@@ -44,8 +46,8 @@ public class Converter {
 				   id = lineParts[0] + "-" + lineParts[1] + "-" + metadata.getNLines();
 			   }
 			   writeMarker(id, lineParts, metadata.getParentCols(), opts, out, metadata, verbose, markerLog);
-			   if (metadata.getNLines() % REPORT_FREQUENCY == 0) {
-				   System.out.println("Processed " + metadata.getNLines());
+			   if (nLinesRead % REPORT_FREQUENCY == 0) {
+				   System.out.println("Processed " +nLinesRead);
 			   }
 		   }
 	   }
@@ -106,7 +108,7 @@ public class Converter {
 		}
 	}
 
-	private static ConverterOptions loadOptions(String[] args) {
+	private static ConverterOptions loadOptions(String[] args) throws IOException {
 		ConverterOptions opts = ConverterOptions.loadOptions(args);
 		System.out.println("Running with options: " + opts);
 		return opts;

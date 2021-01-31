@@ -28,7 +28,7 @@ public class MarkerErrorInfo {
 
 	public void logMarkerMismatch(BufferedWriter out) throws IOException {
 		if (!badGenotypeToInd.isEmpty()) {
-			out.write("Marker:" + markerId + " Segregation type " + type + ", but found (type, number of progeny) genotypes: ");
+			out.write("Marker:" + markerId + " Segregation type " + type.getDisplayString() + " (" + type.getMatchingString() + "), but found (type, number of progeny) genotypes: ");
 			for (Entry<String, Set<String>> entry : badGenotypeToInd.entrySet()) {
 				out.write("(" + entry.getKey() + ", " + entry.getValue().size() + ") ");
 			}

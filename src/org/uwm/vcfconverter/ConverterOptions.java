@@ -6,8 +6,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.zip.GZIPInputStream;
@@ -25,13 +28,14 @@ public class ConverterOptions {
 	private final boolean shouldVerify;
 	private final boolean logFiltering;
 	
-	public static ConverterOptions loadOptions(String[] args) {
+	public static ConverterOptions loadOptions(String[] args) throws IOException {
 		Map<String, String> props = new HashMap<>();
-		for (String arg : args) {
-			String[] parsed = arg.split("=");
-			props.put(parsed[0].toLowerCase(), parsed[1]);
-		}
 		
+		if (args.length < 2) {
+			loadFromFile(args[0], props);
+		} else {
+			loadFromCommandLine(args, props);
+		}
 		Set<MarkerType> typesToKeep = new HashSet<>();
 		if (props.containsKey("types_to_keep")) {
 			String[] types = props.get("types_to_keep").split(",");
@@ -54,6 +58,21 @@ public class ConverterOptions {
 				props.containsKey("only_phased") ? Boolean.parseBoolean(props.get("only_phased")) : false,
 				props.containsKey("verify_uniform_offspring") ? Boolean.parseBoolean(props.get("verify_uniform_offspring")) : false,
 				props.containsKey("log_filtered_markers") ? Boolean.parseBoolean(props.get("log_filtered_markers")) : false);
+	}
+
+	private static void loadFromFile(String file, Map<String, String> props) throws IOException {
+		List<String> allPropLines = Files.readAllLines(Paths.get(file));
+		for (String arg : allPropLines) {
+			String[] parsed = arg.split("=");
+			props.put(parsed[0].toLowerCase(), parsed[1]);
+		}		
+	}
+
+	private static void loadFromCommandLine(String[] args, Map<String, String> props) {
+		for (String arg : args) {
+			String[] parsed = arg.split("=");
+			props.put(parsed[0].toLowerCase(), parsed[1]);
+		}		
 	}
 	
 	private ConverterOptions(String femaleParentName, String maleParentName, String inputFile, String outputFile,
