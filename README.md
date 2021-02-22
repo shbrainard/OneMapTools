@@ -5,7 +5,7 @@ Tools for preparing a VCF file for use in the OneMap pipeline
  1) ```female_parent```: ID of the female parent, as encoded in the VCF file
  2) ```male_parent```: ID of the male parent, as encoded in the VCF file
  3) ```vcf_file```: absolute path of the VCF file (can be gzipped) 
- 4) ```output_file```: absolute path to use for the OneMap .raw file and .log files 
+ 4) ```output_file```: absolute path to use for the OneMap data file and .log files 
  5) ```data_type```: cross type (f2 backcross, f2 intercross, ri self, ri sib, or outcross)
 
  *Optional values:*
