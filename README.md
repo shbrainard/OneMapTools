@@ -21,11 +21,7 @@ Tools for preparing a VCF file for use in the OneMap pipeline
 
 bad.log is organized by individuals and badMarkers.log is organized by markers.
 
-To run the tool:
-
-Compile the source code into converter.jar
-
-Example usage:
+To run the tool, compile source code into converter.jar.  Example usage:
 ```bash
 export vcfFile=/PATH/TO/VCF
 export femaleParent="femaleID"
