@@ -1,5 +1,5 @@
 # OneMapTools
-Tools for preparing a VCF file for use in the OneMap pipeline.  Accepts arguments in standard java.util.Properties format, i.e., one per line: <argumentName>=<argumentValue>.
+Tools for preparing a VCF file for use in the OneMap pipeline.  Accepts arguments in standard java.util.Properties format, i.e., one per line: `<argumentName>=<argumentValue>`.
 
  *Required values:*
  1) ```female_parent```: ID of the female parent, as encoded in the VCF file
