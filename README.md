@@ -24,8 +24,8 @@ bad.log is organized by individuals and badMarkers.log is organized by markers.
 To run the tool, compile source code into converter.jar.  Example usage:
 ```bash
 export vcfFile=/PATH/TO/VCF
-export femaleParent="femaleID"
-export maleParent="maleID"
+export femaleParent=femaleID
+export maleParent=maleID
 export outputFile=/PATH/TO/OUTPUT/FILE
 java -cp converter.jar org.uwm.vcfconverter.Converter female_parent=$femaleParent male_parent=$maleParent vcf_file=$vcfFile output_file=$outputFile data_type=outcross verify_uniform_offspring=true log_filtered_markers=true
 ```
