@@ -10,11 +10,11 @@ Tools for preparing a VCF file for use in the OneMap pipeline
 
  *Optional values:*
  1) ```only_phased```: retain only markers that are already phased in the VCF file (true/false, default=false)
- 2) ```verify_uniform_offspring```: check all aaxaa and aaxbb segregation types, and record violations of expected progeny genotypes (i.e., "aa" and "ab", respectively), in the .log file
+ 2) ```verify_uniform_offspring```: check all aa x aa and aa x bb segregation types, and record violations of expected progeny genotypes (i.e., "aa" and "ab", respectively), in the .log file
  3) ```types_to_keep```: comma separated list of segregation types to retain, when left blank, all segregation types are retained
  4) ```log_filtered_markers```: false by default.  Even when false, some summary statistics about how many markers were filtered and why.  If set to true, separate .log files will be generated for markers that are filtered due to:
 
-- having a filter status other than PASS in the VCF file
+- having a filter status other than `PASS` in the VCF file
 - being a filtered type (by default, just homozygous aa x aa)
 - missing data for a parent
 - failure of the converter to read the line in the VCF file (generally, indicates a bug)
