@@ -30,7 +30,7 @@ export outputFile=/PATH/TO/OUTPUT/FILE
 java -cp converter.jar org.uwm.vcfconverter.Converter female_parent=$femaleParent male_parent=$maleParent vcf_file=$vcfFile output_file=$outputFile data_type=outcross verify_uniform_offspring=true log_filtered_markers=true
 ```
 
-You can also store all these values (`vcf_file=/PATH/TO_VCF`, etc), one per line, in a .config file, and pass the path to the config file as the single argument to the converter tool:
+You can also store all defined variables (e.g., `vcf_file=/PATH/TO_VCF`, etc.) in a .config file, with one variable per line, and pass the path to the .config file as the single argument to converter.jar:
 
 ```bash
 java -cp converter.jar org.uwm.vcfconverter.Converter example.config
