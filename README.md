@@ -1,5 +1,5 @@
 # OneMapTools
-Tools for preparing a VCF file for use in the OneMap pipeline
+Tools for preparing a VCF file for use in the OneMap pipeline.  Accepts arguments in standard java.util.Properties format, i.e., one per line: <argumentName>=<argumentValue>.
 
  *Required values:*
  1) ```female_parent```: ID of the female parent, as encoded in the VCF file
@@ -30,7 +30,7 @@ export outputFile=/PATH/TO/OUTPUT/FILE
 java -cp converter.jar org.uwm.vcfconverter.Converter female_parent=$femaleParent male_parent=$maleParent vcf_file=$vcfFile output_file=$outputFile data_type=outcross verify_uniform_offspring=true log_filtered_markers=true
 ```
 
-You can also store all defined variables (e.g., `vcf_file=/PATH/TO_VCF`, etc.) in a .config file, with one variable per line, and pass the path to the .config file as the single argument to converter.jar:
+You can also store all defined arguments (e.g., `vcf_file=/PATH/TO_VCF`, etc.) in a .config file, with one variable per line, and pass the path to the .config file as the single argument to converter.jar:
 
 ```bash
 java -cp converter.jar org.uwm.vcfconverter.Converter example.config
